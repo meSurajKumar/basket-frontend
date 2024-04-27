@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import { Modal, Typography, Button, Box, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, TextField, Input, FormHelperText } from '@mui/material';
 
 // Importing the service
-import {createBucketService, placeBallService} from '../services/bucketServices.js' 
+import {createBucketService, placeBallService, getBucketService} from '../services/bucketServices.js' 
 import {createBallService, getBallService} from '../services/ballServices.js'
 
 // Importing libraies
@@ -14,7 +14,9 @@ export default function BucketForm() {
     const [ballData , setBallData] = useState({ballColor:'', ballVolume:''})
     const [ballPlaceData , setballPlaceData] = useState({ballData:[{ballName:'', ballCounts:0}]})
     const [allBallData, setAllBallData] = useState([])
+    const [allBucketData, setAllBucketData] = useState([])
     const [refreshBall , setRefreshBall] = useState(false)
+    const [refreshBuckets , setRefreshBucket] = useState(false)
 
     const handleBucketFormChange = (e)=>{
         setBucketData({...bucketData, [e.target.name] : e.target.value })
@@ -47,9 +49,10 @@ export default function BucketForm() {
         e.preventDefault();
         const placeBall = await placeBallService(ballPlaceData)
         toast(placeBall.message);
+        setRefreshBucket(!refreshBuckets);
     }
 
-    // now has to use the use effect
+    // now has to use the use effect for ball data
     useEffect(() => {
         const fetchBallData = async () => {
           try {
@@ -59,6 +62,19 @@ export default function BucketForm() {
             setballPlaceData({
               ballData: ballDataResponse.data.map(() => ({ ballName: '', ballCounts: 0 }))
             });
+          } catch (error) {
+            console.log('error : ', error);
+          }
+        };
+        fetchBallData();
+      }, [refreshBuckets]);
+
+    // now has to use the use effect for bucket data
+    useEffect(() => {
+        const fetchBallData = async () => {
+          try {
+            const bucketDataResponse = await getBucketService();
+            setAllBucketData(bucketDataResponse.data);         
           } catch (error) {
             console.log('error : ', error);
           }
@@ -137,7 +153,12 @@ export default function BucketForm() {
                         <Box sx={{  position:'relative'}} height={300} width={600}  >
                             <Grid item xs={5} md={6} >
                                 <Box sx={{ }} ><Typography variant='h6'>Result</Typography></Box>
-                                <Box sx={{ border: '2px solid black',position: 'absolute',width: '100%',height:'88%' }} >                                </Box>
+                                <Box sx={{ border: '2px solid black',position: 'absolute',width: '100%',height:'88%' }} >
+                                <Box ><Typography variant='h7'>Following are the suggested buckets.</Typography></Box> 
+                                            
+
+                                
+                                </Box>
                             </Grid>
                         </Box>
                     </Grid>
