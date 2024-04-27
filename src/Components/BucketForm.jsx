@@ -1,67 +1,70 @@
 import {useState, useEffect} from 'react';
 import { Modal, Typography, Button, Box, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, TextField, Input, FormHelperText } from '@mui/material';
 
-
 // Importing the service
-import {createBucketService, } from '../services/bucketServices.js' 
-import {createBallService} from '../services/ballServices.js'
+import {createBucketService, placeBallService} from '../services/bucketServices.js' 
+import {createBallService, getBallService} from '../services/ballServices.js'
+
+// Importing libraies
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function BucketForm() {
-    // only for the testing purpose ..
-    const data = [
-        {
-        ballColor : 'red',
-        ballVolume : 10
-    },
-        {
-        ballColor : 'blue',
-        ballVolume : 5
-    },
-        {
-        ballColor : 'green',
-        ballVolume : 10
-        }, {
-            ballColor : 'green',
-            ballVolume : 10
-            }, {
-                ballColor : 'green',
-                ballVolume : 10
-                }, {
-                    ballColor : 'green',
-                    ballVolume : 10
-                    },
-    ]
-
-
-
     const [bucketData , setBucketData] = useState({bucketName:'', volume:''})
     const [ballData , setBallData] = useState({ballColor:'', ballVolume:''})
-
+    const [ballPlaceData , setballPlaceData] = useState({ballData:[{ballName:'', ballCounts:0}]})
+    const [allBallData, setAllBallData] = useState([])
+    const [refreshBall , setRefreshBall] = useState(false)
 
     const handleBucketFormChange = (e)=>{
         setBucketData({...bucketData, [e.target.name] : e.target.value })
     }
 
     const handleBallFormChange = (e)=>{
-        setBucketData({...ballData, [e.target.name] : e.target.value })
+        setBallData({...ballData, [e.target.name] : e.target.value })
     }
 
     const handleBasketForm = async(e)=>{
         e.preventDefault();
-        const creatingBucket = await createBucketService(bucketData)        
+        const creatingBucket = await createBucketService(bucketData) 
+        toast(creatingBucket.message);
     }
 
     const handleBallForm = async(e)=>{
         e.preventDefault();
         const creatingBall = await createBallService(ballData)
+        toast(creatingBall.message);
+        setRefreshBall(!refreshBall);
     }
 
-    const handlePlaceBallForm = (e)=>{
+    const updateBallPlaceData = (index, ballName, ballCounts)=>{
+        const updateBallData = [...ballPlaceData.ballData];
+        updateBallData[index] = {ballName, ballCounts};
+        setballPlaceData({ballData:updateBallData});
+    }
+
+    const handlePlaceBallForm = async(e)=>{
         e.preventDefault();
-        alert('hi')
-        console.log('form data :: ' ,e)
+        const placeBall = await placeBallService(ballPlaceData)
+        toast(placeBall.message);
     }
 
+    // now has to use the use effect
+    useEffect(() => {
+        const fetchBallData = async () => {
+          try {
+            const ballDataResponse = await getBallService();
+            setAllBallData(ballDataResponse.data);      
+            // Initialize ballPlaceData with the same number of elements as allBallData
+            setballPlaceData({
+              ballData: ballDataResponse.data.map(() => ({ ballName: '', ballCounts: 0 }))
+            });
+          } catch (error) {
+            console.log('error : ', error);
+          }
+        };
+        fetchBallData();
+      }, [refreshBall]);
 
 
     return (
@@ -70,6 +73,7 @@ export default function BucketForm() {
                 <Typography variant='h2' textAlign={'center'} >Assesment-Test-(suraj-kumar)</Typography>
                 <Box sx={{ border: '2px solid red' }} mt={4} p={2} >
                     <Grid container spacing={1} justifyContent={'space-between'}>
+                        {/*  this is bucket form */}
 
                         <Box sx={{  position:'relative' }} height={300} width={600} >
                             <Grid item xs={5} md={6} >
@@ -85,6 +89,8 @@ export default function BucketForm() {
                                 </Box>
                             </Grid>
                         </Box>
+                        
+                        {/*  this is ball form */}
 
                         <Box sx={{  position:'relative'}} height={300} width={600}  >
                             <Grid item xs={5} md={6} >
@@ -102,6 +108,9 @@ export default function BucketForm() {
                             </Grid>
                         </Box>
 
+                        {/*  this is ballplace  form */}
+
+
                         <Box sx={{  position:'relative'}} height={300} width={600} >
 
                             <Grid item xs={5} md={6} >
@@ -110,8 +119,9 @@ export default function BucketForm() {
                                     <Box sx={{p:2 , mt:2, minWidth:'200px'}}>
                                     <form onSubmit={handlePlaceBallForm}>                                        
                                         {
-                                            data.map((item, index)=>(
-                                                <Typography key={index} variant='subtitle1' gutterBottom>{item.ballColor}: <input type='number' id={`Ball_${index}`} style={{ padding: '6px', boxSizing: 'border-box' }} required /> </Typography>
+                                            allBallData.map((item, index)=>(
+                                                <Typography key={index} variant='subtitle1' gutterBottom>{item.ballColor}: <input type='number' id={`Ball_${index}`} style={{ padding: '6px', boxSizing: 'border-box' }} value={ballPlaceData.ballData[index].ballCounts}
+                                                onChange={(e) => updateBallPlaceData(index, item.ballColor, parseInt(e.target.value))} required /> </Typography>
                                             ))
                                         }
                                         <Button variant='contained' color='warning' sx={{mt:3}} type='submit'>Place Balls In Buckets</Button>
@@ -121,7 +131,9 @@ export default function BucketForm() {
 
                             </Grid>
                         </Box>
-
+                        
+                        {/*  this is result form */}
+                        
                         <Box sx={{  position:'relative'}} height={300} width={600}  >
                             <Grid item xs={5} md={6} >
                                 <Box sx={{ }} ><Typography variant='h6'>Result</Typography></Box>
@@ -132,6 +144,7 @@ export default function BucketForm() {
                 </Box>
 
             </Box>
+            <ToastContainer />
         </>
     )
 }
