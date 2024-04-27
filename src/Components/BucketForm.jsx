@@ -1,8 +1,13 @@
-import React from 'react'
+import {useState, useEffect} from 'react';
 import { Modal, Typography, Button, Box, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, TextField, Input, FormHelperText } from '@mui/material';
 
 
+// Importing the service
+import {createBucketService, } from '../services/bucketServices.js' 
+import {createBallService} from '../services/ballServices.js'
+
 export default function BucketForm() {
+    // only for the testing purpose ..
     const data = [
         {
         ballColor : 'red',
@@ -27,16 +32,28 @@ export default function BucketForm() {
                     },
     ]
 
-    const handleBasketForm = (e)=>{
-        e.preventDefault();
-        alert('hi')
-        console.log('form data :: ' ,e)
+
+
+    const [bucketData , setBucketData] = useState({bucketName:'', volume:''})
+    const [ballData , setBallData] = useState({ballColor:'', ballVolume:''})
+
+
+    const handleBucketFormChange = (e)=>{
+        setBucketData({...bucketData, [e.target.name] : e.target.value })
     }
 
-    const handleBallForm = (e)=>{
+    const handleBallFormChange = (e)=>{
+        setBucketData({...ballData, [e.target.name] : e.target.value })
+    }
+
+    const handleBasketForm = async(e)=>{
         e.preventDefault();
-        alert('hi')
-        console.log('form data :: ' ,e)
+        const creatingBucket = await createBucketService(bucketData)        
+    }
+
+    const handleBallForm = async(e)=>{
+        e.preventDefault();
+        const creatingBall = await createBallService(ballData)
     }
 
     const handlePlaceBallForm = (e)=>{
@@ -60,8 +77,8 @@ export default function BucketForm() {
                                 <Box sx={{ border: '2px solid black',position: 'absolute',width: '100%',height:'88%'  }}>
                                     <Box sx={{p:2, mt:2, minWidth: '200px'}} >
                                         <form onSubmit={handleBasketForm}>
-                                        <Typography variant='subtitle1' gutterBottom >Basket Name: <input type='text' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} required/> </Typography>
-                                        <Typography variant='subtitle1' gutterBottom >Volume (in inches): <input type='number' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} required /> </Typography>
+                                        <Typography variant='subtitle1' gutterBottom >Basket Name: <input type='text' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} name='bucketName' value={bucketData.bucketName} onChange={handleBucketFormChange} required/> </Typography>
+                                        <Typography variant='subtitle1' gutterBottom >Volume (in inches): <input type='number' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} name='volume' value={bucketData.volume} onChange={handleBucketFormChange} required /> </Typography>
                                         <Button variant='contained' color='warning' sx={{mt:3}} type='submit'>Save</Button>
                                         </form>
                                     </Box>
@@ -75,8 +92,8 @@ export default function BucketForm() {
                                 <Box sx={{ border: '2px solid black',position: 'absolute',width: '100%',height:'88%'  }}>
                                     <Box sx={{p:2 , mt:2, minWidth:'200px'}}>
                                     <form onSubmit={handleBallForm}>
-                                        <Typography variant='subtitle1' gutterBottom >Ball Name: <input type='text' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} required/> </Typography>
-                                        <Typography variant='subtitle1' gutterBottom >Volume (in inches): <input type='number' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} required/> </Typography>
+                                        <Typography variant='subtitle1' gutterBottom >Ball Name: <input type='text' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} name='ballColor' value={ballData.ballColor} onChange={handleBallFormChange} required/> </Typography>
+                                        <Typography variant='subtitle1' gutterBottom >Volume (in inches): <input type='number' id="Basket" style={{ padding: '6px', boxSizing: 'border-box' }} name='ballVolume' value={ballData.ballVolume} onChange={handleBallFormChange} required/> </Typography>
                                         <Button variant='contained' color='warning' sx={{mt:3}} type='submit'>Save</Button>
                                     </form>
                                     </Box>
