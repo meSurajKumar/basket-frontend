@@ -41,7 +41,6 @@ export const placeBallService = async (data) => {
     try {
       console.log(' data in service :: ' , data)
       const response = await axiosInstance.post('/api/v1/bucket/add-balls', data);
-      console.log('response service :: ',JSON.stringify(response.data));
       return response.data; // Optionally return data to caller
     } catch (error) {
       if (error.response) {
@@ -65,7 +64,6 @@ export const placeBallService = async (data) => {
   export const getBucketService = async () => {
     try {
       const response = await axiosInstance.get('/api/v1/bucket');
-      console.log('bb sr',JSON.stringify(response.data));
       return response.data; // Optionally return data to caller
     } catch (error) {
       if (error.response) {
