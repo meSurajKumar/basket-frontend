@@ -1,8 +1,34 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Assignment Frontend
+# Pre-requisites
+- Install [Node.js](https://nodejs.org/en/) version is 18
 
-Currently, two official plugins are available:
+# Getting started
+- Clone the repository
+```
+git clone https://github.com/meSurajKumar/basket-frontend.git
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```
+- Install dependencies
+```
+cd frontend
+npm install
+```
+# Rename server.env to .env
+```
+rename the client.env file to .env 
+```
+
+
+# Run the project
+```
+npm run dev
+
+```
+  Navigate to `http://localhost:5173/`
+# Environment vars
+This project uses the following environment variables:
+| Name                          | Description                         | Default Value                                  |
+| ----------------------------- | ------------------------------------| -----------------------------------------------|
+|VITE_BASEURL           | server url            | http://localhost:3000      |
